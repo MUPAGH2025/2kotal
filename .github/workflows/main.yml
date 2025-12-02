@@ -8,7 +8,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt-get install texlive-xetex inkscape pandoc
       - run: pip install nbconvert
-      - run: python -m nbconvert --to pdf --execute lab3projekt03.ipynb
+      - run: python -m nbconvert --to pdf --no-input --execute lab3projekt03.ipynb
       - uses: actions/upload-artifact@v4
         with:
+          name: raport.pdf
           path: lab3projekt03.pdf
