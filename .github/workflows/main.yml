@@ -12,7 +12,59 @@ jobs:
       - run: sed -i '/HBox(children=/d' PROJEKT_Aleksandra_Kot.tex
       - run: sed -i 's/\\title{PROJEKT}/\\title{Modelowanie układów przepływowych - Projekt pierwszy}/' PROJEKT_Aleksandra_Kot.tex
       - run: sed -i '/\\begin{document}/a \\author{Aleksandra Kot}\n\\maketitle\n' PROJEKT_Aleksandra_Kot.tex
+               - name: Add LaTeX Captions using Python
+               run: |
+                python <<EOF
+                import re 
+                
+                CAPTIONS = [
+                    "Schemat batymetrii (dołek) i wychylenia powierzchni swobodnej ($\\zeta$).",
+                    "Początkowe wychylenie powierzchni swobodnej (impuls fali).",
+                    "Propagacja fali i jej interakcja z dołkiem batymetrycznym.",
+                    "Wykres wychylenia cząstki po przejściu fali."
+                ]
+                
+                TEX_FILE = 'PROJEKT_Aleksandra_Kot.tex'
+                output_lines = []
+                caption_index = 0
+                
+                try:
+                    with open(TEX_FILE, 'r', encoding='utf-8') as f:
+                        for line in f:
+                            # Znajdź linie z obrazkami
+                            if '\\includegraphics' in line:
+                                if caption_index < len(CAPTIONS):
+                                    label = f'fig:{caption_index+1}'
+                                    
+                                    # Wstawienie początku figure, caption i label
+                                    output_lines.append('\\begin{figure}[htbp]\n')
+                                    output_lines.append('\\centering\n')
+                                    output_lines.append(f'\\caption{{{CAPTIONS[caption_index]}}}\n')
+                                    output_lines.append(f'\\label{{{label}}}\n')
+                                    
+                                    # Dodanie oryginalnej linii \includegraphics
+                                    output_lines.append(line)
+                                    
+                                    # Wstawienie końca figure
+                                    output_lines.append('\\end{figure}\n')
+                                    
+                                    caption_index += 1
+                                    continue # Przejście do następnej linii
+                
+                            # Dodanie wszystkich innych linii bez zmian
+                            output_lines.append(line)
+                
+                    with open(TEX_FILE, 'w', encoding='utf-8') as f:
+                        f.writelines(output_lines)
+                    print("Python script executed successfully: Captions added.")
+                except Exception as e:
+                    print(f"Error in Python script: {e}")
+                    exit(1)
+                EOF
+
       - run: xelatex -interaction=nonstopmode PROJEKT_Aleksandra_Kot.tex
+      - run: xelatex -interaction=nonstopmode PROJEKT_Aleksandra_Kot.tex
+
       - uses: actions/upload-artifact@v4
         with:
           name: raport
