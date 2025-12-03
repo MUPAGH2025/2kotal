@@ -10,57 +10,78 @@ jobs:
       - run: pip install nbconvert
       - run: jupyter nbconvert --to latex --no-input --execute PROJEKT_Aleksandra_Kot.ipynb
       - run: sed -i '/HBox(children=/d' PROJEKT_Aleksandra_Kot.tex
-      - run: sed -i 's/\\title{PROJEKT}/\\title{Modelowanie układów przepływowych - Projekt pierwszy}/' PROJEKT_Aleksandra_Kot.tex
-      - run: sed -i 's/\\begin{document}/\\begin{document}\n\\author{Aleksandra Kot}\n\\maketitle/' PROJEKT_Aleksandra_Kot.tex
-#      - name: Add LaTeX Captions using Python
-#        run: |
-#          python <<EOF
-#          import re
-#
-#          CAPTIONS = [
-#              "Schemat batymetrii (dołek) i wychylenia powierzchni swobodnej ($\\zeta$).",
-#              "Początkowe wychylenie powierzchni swobodnej (impuls fali).",
-#              "Propagacja fali i jej interakcja z dołkiem batymetrycznym.",
-#              "Wykres wychylenia cząstki po przejściu fali."
-#          ]
-#
-#          TEX_FILE = 'PROJEKT_Aleksandra_Kot.tex'
-#          output_lines = []
-#          caption_index = 0
-#
-#          try:
-#              with open(TEX_FILE, 'r', encoding='utf-8') as f:
-#                  for line in f:
-#                      # Znajdź linie z obrazkami
-#                      if '\\includegraphics' in line:
-#                          if caption_index < len(CAPTIONS):
-#                              label = f'fig:{caption_index+1}'
-#
-#                              # Wstawienie początku figure, caption i label
-#                              output_lines.append('\\begin{figure}[htbp]\n')
-#                              output_lines.append('\\centering\n')
-#                              output_lines.append(f'\\caption{{{CAPTIONS[caption_index]}}}\n')
-#                              output_lines.append(f'\\label{{{label}}}\n')
-#
-#                              # Dodanie oryginalnej linii \includegraphics
-#                              output_lines.append(line)
-#
-#                              # Wstawienie końca figure
-#                              output_lines.append('\\end{figure}\n')
-#
-#                              caption_index += 1
-#                              continue # Przejście do następnej linii
-#
-#                      # Dodanie wszystkich innych linii bez zmian
-#                      output_lines.append(line)
-#
-#              with open(TEX_FILE, 'w', encoding='utf-8') as f:
-#                  f.writelines(output_lines)
-#              print("Python script executed successfully: Captions added.")
-#          except Exception as e:
-#              print(f"Error in Python script: {e}")
-#              exit(1)
-#          EOF
+      - run: sed -i 's/\\title{PROJEKT}/\\title{Modelowanie układów przepływowych - Projekt pierwszy}\\author{Aleksandra Kot}/' PROJEKT_Aleksandra_Kot.tex
+      - name: Add LaTeX Captions using Python
+        run: |
+          python <<EOF
+          # Skrypt podmieniający obrazki na figury z podpisami
+          
+          CAPTIONS = [
+              "Rozkład wysokości powierzchni swobodnej $\zeta = h - bath$ dla wybranych chwil czasowych.",
+              "Pola wektorowe prędkości przepływu dla wybranych chwil czasowych.",
+              "Przekrój wysokości powierzchni swobodnej $\zeta(x)$ w połowie domeny ($y=0.5$m).",
+              "Przekrój wysokości powierzchni swobodnej $\zeta(y)$ nad dołkiem ($x=0.9$m)."
+          ]
+
+          TEX_FILE = 'PROJEKT_Aleksandra_Kot.tex'
+          
+          try:
+              with open(TEX_FILE, 'r', encoding='utf-8') as f:
+                  lines = f.readlines()
+              
+              output_lines = []
+              caption_index = 0
+              i = 0
+              
+              while i < len(lines):
+                  line = lines[i]
+                  
+                  is_image = ('\\includegraphics' in line) or ('\\adjustimage' in line)
+                  
+                  if is_image and caption_index < len(CAPTIONS):
+                      
+                      prev_line_is_center = (len(output_lines) > 0 and '\\begin{center}' in output_lines[-1])
+                      
+                      next_line_is_center_end = False
+                      if i + 1 < len(lines):
+                          if '\\end{center}' in lines[i+1]:
+                              next_line_is_center_end = True
+                      
+                      caption_text = CAPTIONS[caption_index]
+                      label_text = f"fig:{caption_index+1}"
+                      
+                      if prev_line_is_center and next_line_is_center_end:
+                          output_lines[-1] = '\\begin{figure}[htbp]\n\\centering\n'
+                          
+                          output_lines.append(line)
+                          
+                          output_lines.append(f'\\caption{{{caption_text}}}\n\\label{{{label_text}}}\n\\end{figure}\n')
+                          
+                          i += 2 
+                          caption_index += 1
+                          continue
+                          
+                      else:
+                          output_lines.append('\\begin{figure}[htbp]\n\\centering\n')
+                          output_lines.append(line)
+                          output_lines.append(f'\\caption{{{caption_text}}}\n\\label{{{label_text}}}\n\\end{figure}\n')
+                          
+                          i += 1
+                          caption_index += 1
+                          continue
+
+                  output_lines.append(line)
+                  i += 1
+
+              with open(TEX_FILE, 'w', encoding='utf-8') as f:
+                  f.writelines(output_lines)
+              
+              print(f"Przetworzono plik. Dodano {caption_index} podpisów.")
+              
+          except Exception as e:
+              print(f"Error in Python script: {e}")
+              exit(1)
+          EOF
 
       - run: xelatex -interaction=nonstopmode PROJEKT_Aleksandra_Kot.tex
       - run: xelatex -interaction=nonstopmode PROJEKT_Aleksandra_Kot.tex
