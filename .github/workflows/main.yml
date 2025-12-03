@@ -9,9 +9,9 @@ jobs:
       - run: sudo apt-get install texlive-xetex inkscape pandoc
       - run: pip install nbconvert
       - run: jupyter nbconvert --to latex --no-input --execute PROJEKT_Aleksandra_Kot.ipynb
-      - run: sed -i '/HBox(children=/d' PROJEKT.tex
-      - run: xelatex -interaction=nonstopmode PROJEKT.tex
+      - run: sed -i '/HBox(children=/d' PROJEKT_Aleksandra_Kot.tex
+      - run: xelatex -interaction=nonstopmode PROJEKT_Aleksandra_Kot.tex
       - uses: actions/upload-artifact@v4
         with:
-          name: raport.pdf
-          path: PROJEKT.pdf
+          name: raport
+          path: PROJEKT_Aleksandra_Kot.pdf
