@@ -10,6 +10,8 @@ jobs:
       - run: pip install nbconvert
       - run: jupyter nbconvert --to latex --no-input --execute PROJEKT_Aleksandra_Kot.ipynb
       - run: sed -i '/HBox(children=/d' PROJEKT_Aleksandra_Kot.tex
+      - run: sed -i 's/\\title{PROJEKT}/\\title{Modelowanie układów przepływowych - Projekt pierwszy}/' PROJEKT_Aleksandra_Kot.tex
+      - run: sed -i '/\\begin{document}/a \\author{Aleksandra Kot}\n\\maketitle\n' PROJEKT_Aleksandra_Kot.tex
       - run: xelatex -interaction=nonstopmode PROJEKT_Aleksandra_Kot.tex
       - uses: actions/upload-artifact@v4
         with:
