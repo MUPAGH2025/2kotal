@@ -11,7 +11,7 @@ jobs:
       - run: jupyter nbconvert --to latex --no-input --execute PROJEKT_Aleksandra_Kot.ipynb
       - run: sed -i '/HBox(children=/d' PROJEKT_Aleksandra_Kot.tex
       - run: sed -i 's/\\title{PROJEKT}/\\title{Modelowanie układów przepływowych - Projekt pierwszy}/' PROJEKT_Aleksandra_Kot.tex
-      - run: sed -i '/\\begin{document}/a \\author{Aleksandra Kot}\n\\maketitle\n' PROJEKT_Aleksandra_Kot.tex
+      - run: sed -i 's/\\begin{document}/\\begin{document}\\n\\author{Aleksandra Kot}\\n\\maketitle/' PROJEKT_Aleksandra_Kot.tex
 #      - name: Add LaTeX Captions using Python
 #        run: |
 #          python <<EOF
