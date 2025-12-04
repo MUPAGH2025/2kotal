@@ -9,7 +9,8 @@ jobs:
       - run: sudo apt-get install texlive-xetex texlive-latex-extra inkscape pandoc
       - run: pip install nbconvert
       - run: jupyter nbconvert --to latex --no-input --execute PROJEKT_Aleksandra_Kot.ipynb
-      - run: sed -i '/\\documentclass/a \\usepackage{caption}\n\\usepackage{float}' PROJEKT_Aleksandra_Kot.tex
+      - run: sed -i '/\\documentclass/a \\usepackage{caption}' PROJEKT_Aleksandra_Kot.tex
+      - run: sed -i '/\\documentclass/a \\usepackage{float}' PROJEKT_Aleksandra_Kot.tex
       - run: sed -i '/HBox(children=/d' PROJEKT_Aleksandra_Kot.tex
       - run: sed -i 's/\\title{PROJEKT}/\\title{Modelowanie układów przepływowych - Projekt pierwszy}\\author{Aleksandra Kot}/' PROJEKT_Aleksandra_Kot.tex
       - run: xelatex -interaction=nonstopmode PROJEKT_Aleksandra_Kot.tex
